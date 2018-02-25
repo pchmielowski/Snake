@@ -22,15 +22,24 @@ main =
     g <- liftIO $ getStdGen
     loop
       w
-      State {delta = 0, before = t, x = 0, y = 0, dx = 0, dy = 0, generator = g}
+      State
+      { delta = 0
+      , before = t
+      , pos = Vector {x = 0, y = 0}
+      , velocity = Vector {x = 0, y = 0}
+      , generator = g
+      }
+
+data Vector = Vector
+  { x :: Integer
+  , y :: Integer
+  }
 
 data State = State
   { delta :: Integer
   , before :: Integer
-  , x :: Integer
-  , dx :: Integer
-  , y :: Integer
-  , dy :: Integer
+  , pos :: Vector
+  , velocity :: Vector
   , generator :: StdGen
   }
 
@@ -64,18 +73,29 @@ loop w state = do
   where
     nextFrame now =
       state
-      {delta = 0, before = now, x = x state + dx state, y = y state + dy state}
-    changeDirection now ToLeft = (updateTime now) {dx = (-1), dy = 0}
-    changeDirection now ToRight = (updateTime now) {dx = 1, dy = 0}
-    changeDirection now ToDown = (updateTime now) {dx = 0, dy = 1}
-    changeDirection now ToUp = (updateTime now) {dx = 0, dy = (-1)}
+      { delta = 0
+      , before = now
+      , pos =
+          Vector
+          { x = x (pos state) + x (velocity state)
+          , y = y (pos state) + y (velocity state)
+          }
+      }
+    changeDirection now ToLeft =
+      (updateTime now) {velocity = Vector {x = (-1), y = 0}}
+    changeDirection now ToRight =
+      (updateTime now) {velocity = Vector {x = 1, y = 0}}
+    changeDirection now ToDown =
+      (updateTime now) {velocity = Vector {x = 0, y = 1}}
+    changeDirection now ToUp =
+      (updateTime now) {velocity = Vector {x = 0, y = (-1)}}
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
     updateScreen :: Curses ()
     updateScreen = do
       updateWindow w $ do
         clear
-        moveCursor (y state) (x state)
+        moveCursor (y (pos state)) (x (pos state))
         drawGlyph glyphStipple
         moveCursor
           (toInteger ((mod . fst . next) (generator state) 40))
