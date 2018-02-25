@@ -13,17 +13,6 @@ frameDelay = 123
 currentTime :: IO Integer
 currentTime = fmap round $ fmap (* 1000) getPOSIXTime
 
--- main :: IO ()
--- main = do
---   t <- currentTime
---   loop 0 t
--- loop delta before = do
---   now <- currentTime
---   if (delta > frameDelay)
---     then do
---       putStrLn $ show delta
---       loop 0 now
---     else loop (delta + (now - before)) now
 main :: IO ()
 main =
   runCurses $ do
