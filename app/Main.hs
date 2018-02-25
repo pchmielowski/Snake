@@ -123,8 +123,12 @@ start = Vector 0 0
 end = Vector 10 10
 
 drawFrame (Vector sx sy) (Vector ex ey) = do
-  mapM_ drawBlock [sx .. ex]
+  mapM_ drawBlock $ zip [sx .. ex] $ repeat sy
+  mapM_ drawBlock $ zip [sx .. ex] $ repeat ey
+  mapM_ drawBlock $ zip (repeat sx) [sy .. ey]
+  mapM_ drawBlock $ zip (repeat ex) [sy .. ey]
   where
-    drawBlock y = do
-      moveCursor y 0
+    drawBlock :: (Integer, Integer) -> Update ()
+    drawBlock (x, y) = do
+      moveCursor y x
       drawGlyph glyphStipple
