@@ -132,10 +132,10 @@ loop w state = do
       moveCursor y $ 2 * x + 1
       drawGlyph glyph
     drawFrame (Vector sx sy) (Vector ex ey) = do
-      mapM_ drawBlock $ zip [sx - 1 .. ex+1] $ repeat (sy-1)
-      mapM_ drawBlock $ zip [sx-1 .. ex+1] $ repeat (ey + 1)
-      mapM_ drawBlock $ zip (repeat (sx-1)) [sy-1 .. ey+1]
-      mapM_ drawBlock $ zip (repeat (ex+1)) [sy-1 .. ey+1]
+      mapM_ drawBlock $ zip [sx - 1 .. ex + 1] $ repeat (sy - 1)
+      mapM_ drawBlock $ zip [sx - 1 .. ex + 1] $ repeat (ey + 1)
+      mapM_ drawBlock $ zip (repeat (sx - 1)) [sy - 1 .. ey + 1]
+      mapM_ drawBlock $ zip (repeat (ex + 1)) [sy - 1 .. ey + 1]
       where
         drawBlock :: (Integer, Integer) -> Update ()
         drawBlock (x, y) = do
