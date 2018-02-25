@@ -54,10 +54,16 @@ data Direction
   | ToUp
   | ToDown
 
+frameColor = 0
+
+snakeColor = 1
+
 loop :: Window -> State -> Curses ()
 loop w state = do
   now <- liftIO $ currentTime
-  updateScreen
+  frameColor <- newColorID ColorRed ColorBlack 1
+  snakeColor <- newColorID ColorBlue ColorBlack 2
+  updateScreen frameColor snakeColor
   if (delta state > frameDelay)
     then loop w $ nextFrame now
     else do
@@ -103,11 +109,13 @@ loop w state = do
     changeDirection now ToUp = (updateTime now) {velocity = Vector 0 (-1)}
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
-    updateScreen :: Curses ()
-    updateScreen = do
+    -- updateScreen :: Curses ()
+    updateScreen frameColor snakeColor = do
       updateWindow w $ do
         clear
+        setColor frameColor
         drawFrame start end
+        setColor snakeColor
         mapM drawSnakePart $ snake state
         draw glyphPlus $ meal state
       render
@@ -117,18 +125,17 @@ loop w state = do
       drawGlyph glyph
       moveCursor y $ 2 * x + 1
       drawGlyph glyph
+    drawFrame (Vector sx sy) (Vector ex ey) = do
+      mapM_ drawBlock $ zip [sx .. ex] $ repeat sy
+      mapM_ drawBlock $ zip [sx .. ex] $ repeat ey
+      mapM_ drawBlock $ zip (repeat sx) [sy .. ey]
+      mapM_ drawBlock $ zip (repeat ex) [sy .. ey]
+      where
+        drawBlock :: (Integer, Integer) -> Update ()
+        drawBlock (x, y) = do
+          moveCursor y x
+          drawGlyph glyphStipple
 
 start = Vector 0 0
 
 end = Vector 10 10
-
-drawFrame (Vector sx sy) (Vector ex ey) = do
-  mapM_ drawBlock $ zip [sx .. ex] $ repeat sy
-  mapM_ drawBlock $ zip [sx .. ex] $ repeat ey
-  mapM_ drawBlock $ zip (repeat sx) [sy .. ey]
-  mapM_ drawBlock $ zip (repeat ex) [sy .. ey]
-  where
-    drawBlock :: (Integer, Integer) -> Update ()
-    drawBlock (x, y) = do
-      moveCursor y x
-      drawGlyph glyphStipple
