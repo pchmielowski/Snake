@@ -13,6 +13,14 @@ frameDelay = 123
 currentTime :: IO Integer
 currentTime = fmap round $ fmap (* 1000) getPOSIXTime
 
+width = 64
+
+height = 32
+
+start = Vector 4 4
+
+end = Vector ((x start) + width) ((y start) + height)
+
 main :: IO ()
 main =
   runCurses $ do
@@ -25,7 +33,7 @@ main =
       State
       { delta = 0
       , before = t
-      , snake = [Vector 2 0, Vector 1 0, Vector 0 0]
+      , snake = [start]
       , velocity = Vector 0 1
       , generator = g
       , meal = randomMealPosition g
@@ -38,6 +46,10 @@ randomMealPosition g = Vector rand rand
 data Vector =
   Vector Integer
          Integer
+
+x (Vector x _) = x
+
+y (Vector _ y) = y
 
 data State = State
   { delta :: Integer
@@ -53,10 +65,6 @@ data Direction
   | ToRight
   | ToUp
   | ToDown
-
-frameColor = 0
-
-snakeColor = 1
 
 loop :: Window -> State -> Curses ()
 loop w state = do
@@ -100,8 +108,6 @@ loop w state = do
     resetTimer now = state {delta = 0, before = now}
     newHead = updatePosition (head (snake state)) (velocity state)
     updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
-    x (Vector x _) = x
-    y (Vector _ y) = y
     -- TODO: do not allow to reverse direction
     changeDirection now ToLeft = (updateTime now) {velocity = Vector (-1) 0}
     changeDirection now ToRight = (updateTime now) {velocity = Vector 1 0}
@@ -126,16 +132,12 @@ loop w state = do
       moveCursor y $ 2 * x + 1
       drawGlyph glyph
     drawFrame (Vector sx sy) (Vector ex ey) = do
-      mapM_ drawBlock $ zip [sx .. ex] $ repeat sy
-      mapM_ drawBlock $ zip [sx .. ex] $ repeat ey
-      mapM_ drawBlock $ zip (repeat sx) [sy .. ey]
-      mapM_ drawBlock $ zip (repeat ex) [sy .. ey]
+      mapM_ drawBlock $ zip [sx - 1 .. ex+1] $ repeat (sy-1)
+      mapM_ drawBlock $ zip [sx-1 .. ex+1] $ repeat (ey + 1)
+      mapM_ drawBlock $ zip (repeat (sx-1)) [sy-1 .. ey+1]
+      mapM_ drawBlock $ zip (repeat (ex+1)) [sy-1 .. ey+1]
       where
         drawBlock :: (Integer, Integer) -> Update ()
         drawBlock (x, y) = do
           moveCursor y x
           drawGlyph glyphStipple
-
-start = Vector 0 0
-
-end = Vector 10 10
