@@ -25,7 +25,7 @@ main =
       State
       { delta = 0
       , before = t
-      , pos = Vector {x = 0, y = 0}
+      , snake = Vector {x = 0, y = 0}
       , velocity = Vector {x = 0, y = 0}
       , generator = g
       , meal = randomMealPosition g
@@ -43,7 +43,7 @@ data Vector = Vector
 data State = State
   { delta :: Integer
   , before :: Integer
-  , pos :: Vector
+  , snake :: Vector
   , velocity :: Vector
   , generator :: StdGen
   , meal :: Vector
@@ -78,7 +78,7 @@ loop w state = do
             else loop w $ updateTime now
   where
     nextFrame now =
-      if (x (pos state) == x (meal state) && y (pos state) == y (meal state))
+      if (x (snake state) == x (meal state) && y (snake state) == y (meal state))
         then (nexPosition now)
              { meal = randomMealPosition nextGenerator
              , generator = nextGenerator
@@ -89,10 +89,10 @@ loop w state = do
       state
       { delta = 0
       , before = now
-      , pos =
+      , snake =
           Vector
-          { x = x (pos state) + x (velocity state)
-          , y = y (pos state) + y (velocity state)
+          { x = x (snake state) + x (velocity state)
+          , y = y (snake state) + y (velocity state)
           }
       }
     changeDirection now ToLeft =
@@ -109,7 +109,7 @@ loop w state = do
     updateScreen = do
       updateWindow w $ do
         clear
-        moveCursor (y (pos state)) (x (pos state))
+        moveCursor (y (snake state)) (x (snake state))
         drawGlyph glyphStipple
         moveCursor (y (meal state)) (x (meal state))
         drawGlyph glyphPlus
