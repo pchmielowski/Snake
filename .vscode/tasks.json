@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build and run",
+            "label": "build",
             "type": "shell",
-            "command": "stack build && stack exec snake-exe",
+            "command": "stack build && echo Build OK",
             "group": {
                 "kind": "build",
                 "isDefault": true
