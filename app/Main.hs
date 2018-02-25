@@ -78,9 +78,10 @@ loop w state = do
             then return ()
             else loop w $ updateTime now
   where
+    -- TODO: check colision with walls
     nextFrame now =
       if (hitsItself)
-        then error "Loser"
+        then error "Loser" -- TODO: handle
         else if (eatsMeal)
                then (resetTimer now)
                     { snake = newHead : snake state
@@ -101,6 +102,7 @@ loop w state = do
       { x = x (head (snake state)) + x (velocity state)
       , y = y (head (snake state)) + y (velocity state)
       }
+    -- TODO: do not allow to reverse direction
     changeDirection now ToLeft =
       (updateTime now) {velocity = Vector {x = (-1), y = 0}}
     changeDirection now ToRight =
