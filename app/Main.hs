@@ -76,6 +76,10 @@ loop w state = do
             else loop w $ updateTime now
   where
     nextFrame now =
+      if (x (pos state) == x (meal state) && y (pos state) == y (meal state))
+        then (nexPosition now) {meal = Vector {x = 0, y = 0}}
+        else nexPosition now
+    nexPosition now =
       state
       { delta = 0
       , before = now
