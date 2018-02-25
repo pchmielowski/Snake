@@ -29,39 +29,46 @@ main =
     setEcho False
     w <- defaultWindow
     t <- liftIO $ currentTime
-    loop w 0 t 0 0
+    -- loop w 0 t 0 0
+    loop w State {delta = 0, before = t, x = 0, dx = 0}
 
 data State = State
-  { time :: Integer
+  { delta :: Integer
+  , before :: Integer
+  , x :: Integer
+  , dx :: Integer
   }
 
-loop :: Window -> Integer -> Integer -> Integer -> Integer -> Curses ()
-loop w delta before x dx = do
+loop :: Window -> State -> Curses ()
+loop w state = do
   now <- liftIO $ currentTime
   updateScreen
-  if (delta > frameDelay)
-    then loop w 0 now (x + dx) dx
+  if (delta state > frameDelay)
+    -- then loop w 0 now (x + dx) dx
+    then loop w state {delta = 0, before = now, x = x state  + dx state}
     else do
       ev <- getEvent w $ Just 0
       case ev of
-        Nothing -> loop w (delta + (now - before)) now x dx
+        -- Nothing -> loop w (delta + (now - before)) now x dx
+        Nothing -> loop w state {delta = delta state + (now - before state), before = now}
         Just (EventSpecialKey KeyLeftArrow) ->
-          loop w (delta + (now - before)) now x (-1)
-        Just (EventSpecialKey KeyRightArrow) ->
-          loop w (delta + (now - before)) now x 1
-        Just (EventSpecialKey KeyUpArrow) ->
-          loop w (delta + (now - before)) now x 0
-        Just (EventSpecialKey KeyDownArrow) ->
-          loop w (delta + (now - before)) now x 0
+          -- loop w (delta + (now - before)) now x (-1)
+          loop w state {delta = delta state + (now - before state), before = now, dx=(-1)}
+        -- Just (EventSpecialKey KeyRightArrow) ->
+          -- loop w (delta + (now - before)) now x 1
+        -- Just (EventSpecialKey KeyUpArrow) ->
+          -- loop w (delta + (now - before)) now x 0
+        -- Just (EventSpecialKey KeyDownArrow) ->
+          -- loop w (delta + (now - before)) now x 0
         Just ev' ->
           if (ev' == EventCharacter 'q')
             then return ()
-            else loop w (delta + (now - before)) now x dx
+            else loop w state {delta = delta state + (now - before state), before = now}
   where
     updateScreen :: Curses ()
     updateScreen = do
       updateWindow w $ do
         clear
-        moveCursor 3 x
+        moveCursor 3 $ x state
         drawGlyph glyphStipple
       render
