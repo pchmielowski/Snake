@@ -28,10 +28,12 @@ main =
       , pos = Vector {x = 0, y = 0}
       , velocity = Vector {x = 0, y = 0}
       , generator = g
-      , meal = Vector {x = rand g, y = rand g}
+      , meal = randomMealPosition g
       }
+
+randomMealPosition g = Vector {x = rand, y = rand}
   where
-    rand g = toInteger $ (mod . fst . next) g 40
+    rand = toInteger $ (mod . fst . next) g 40
 
 data Vector = Vector
   { x :: Integer
@@ -77,8 +79,12 @@ loop w state = do
   where
     nextFrame now =
       if (x (pos state) == x (meal state) && y (pos state) == y (meal state))
-        then (nexPosition now) {meal = Vector {x = 0, y = 0}}
+        then (nexPosition now)
+             { meal = randomMealPosition nextGenerator
+             , generator = nextGenerator
+             }
         else nexPosition now
+    nextGenerator = (snd . next) (generator state)
     nexPosition now =
       state
       { delta = 0
