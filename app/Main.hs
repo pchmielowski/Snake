@@ -25,21 +25,19 @@ main =
       State
       { delta = 0
       , before = t
-      , snake =
-          [Vector {x = 2, y = 0}, Vector {x = 1, y = 0}, Vector {x = 0, y = 0}]
-      , velocity = Vector {x = 0, y = 0}
+      , snake = [Vector 2 0, Vector 1 0, Vector 0 0]
+      , velocity = Vector 0 0
       , generator = g
       , meal = randomMealPosition g
       }
 
-randomMealPosition g = Vector {x = rand, y = rand}
+randomMealPosition g = Vector rand rand
   where
     rand = toInteger $ (mod . fst . next) g 40
 
-data Vector = Vector
-  { x :: Integer
-  , y :: Integer
-  }
+data Vector =
+  Vector Integer
+         Integer
 
 data State = State
   { delta :: Integer
@@ -77,8 +75,8 @@ loop w state = do
           if (ev' == EventCharacter 'q')
             then return ()
             else loop w $ updateTime now
-  where
     -- TODO: check colision with walls
+  where
     nextFrame now =
       if (hitsItself)
         then error "Loser" -- TODO: handle
@@ -99,18 +97,15 @@ loop w state = do
     resetTimer now = state {delta = 0, before = now}
     newHead =
       Vector
-      { x = x (head (snake state)) + x (velocity state)
-      , y = y (head (snake state)) + y (velocity state)
-      }
+        (x (head (snake state)) + x (velocity state))
+        (y (head (snake state)) + y (velocity state))
+    x (Vector x _) = x
+    y (Vector _ y) = y
     -- TODO: do not allow to reverse direction
-    changeDirection now ToLeft =
-      (updateTime now) {velocity = Vector {x = (-1), y = 0}}
-    changeDirection now ToRight =
-      (updateTime now) {velocity = Vector {x = 1, y = 0}}
-    changeDirection now ToDown =
-      (updateTime now) {velocity = Vector {x = 0, y = 1}}
-    changeDirection now ToUp =
-      (updateTime now) {velocity = Vector {x = 0, y = (-1)}}
+    changeDirection now ToLeft = (updateTime now) {velocity = Vector (-1) 0}
+    changeDirection now ToRight = (updateTime now) {velocity = Vector 1 0}
+    changeDirection now ToDown = (updateTime now) {velocity = Vector 0 1}
+    changeDirection now ToUp = (updateTime now) {velocity = Vector 0 (-1)}
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
     updateScreen :: Curses ()
