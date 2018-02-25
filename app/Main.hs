@@ -81,14 +81,14 @@ loop w state = do
     nextFrame now =
       if (x (head (snake state)) == x (meal state) &&
           y (head (snake state)) == y (meal state))
-        then (nexPosition now)
-             { meal = randomMealPosition nextGenerator
+        then (resetTimer now)
+             { snake = newHead : snake state
+             , meal = randomMealPosition nextGenerator
              , generator = nextGenerator
              }
-        else nexPosition now
+        else (resetTimer now) {snake = init $ newHead : snake state}
     nextGenerator = (snd . next) (generator state)
-    nexPosition now =
-      state {delta = 0, before = now, snake = init $ newHead : snake state}
+    resetTimer now = state {delta = 0, before = now}
     newHead =
       Vector
       { x = x (head (snake state)) + x (velocity state)
