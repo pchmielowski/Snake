@@ -93,12 +93,10 @@ loop w state = do
     eatsMeal =
       x (head (snake state)) == x (meal state) &&
       y (head (snake state)) == y (meal state)
-    nextGenerator = (snd . next) (generator state)
+    nextGenerator = (snd . next) $ generator state
     resetTimer now = state {delta = 0, before = now}
-    newHead =
-      Vector
-        (x (head (snake state)) + x (velocity state))
-        (y (head (snake state)) + y (velocity state))
+    newHead = updatePosition (head (snake state)) (velocity state)
+    updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
     x (Vector x _) = x
     y (Vector _ y) = y
     -- TODO: do not allow to reverse direction
