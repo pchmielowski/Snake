@@ -109,7 +109,11 @@ loop w state = do
                            }
                       else (resetTimer now)
                            {snake = init $ newHead : snake state}
-    hitsWall = (x newHead) > (x end) -- TODO: more conditions
+    hitsWall -- TODO: does not work correctly
+     =
+      let x' = x newHead
+          y' = y newHead
+      in x' > x end || x' < x start || y' > y end || y' < y start
     hitsItself = any (samePosition newHead) $ tail $ snake state
     eatsMeal = samePosition (head (snake state)) $ meal state
     samePosition (Vector ax ay) (Vector bx by) = ax == bx && ay == by
@@ -136,9 +140,9 @@ loop w state = do
       render
     drawSnakePart = draw glyphStipple
     draw glyph (Vector x y) = do
-      moveCursor y $ 2 * x
+      moveCursor y $ scale x
       drawGlyph glyph
-      moveCursor y $ 2 * x + 1
+      moveCursor y $ scale x + 1
       drawGlyph glyph
     drawFrame (Vector sx sy) (Vector ex ey) = do
       mapM_ drawBlock $ zip [sx - 1 .. ex + 1] $ repeat (sy - 1)
@@ -148,5 +152,8 @@ loop w state = do
       where
         drawBlock :: (Integer, Integer) -> Update ()
         drawBlock (x, y) = do
-          moveCursor y x
+          moveCursor y $ scale x
           drawGlyph glyphStipple
+          moveCursor y $ scale x + 1
+          drawGlyph glyphStipple
+    scale x = 2 * x
