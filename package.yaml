@@ -35,6 +35,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - snake
+    - ncurses
 
 tests:
   snake-test:

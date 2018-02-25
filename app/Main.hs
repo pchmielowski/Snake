@@ -1,4 +1,5 @@
 module Main where
+import UI.NCurses
 
 import Lib
 
