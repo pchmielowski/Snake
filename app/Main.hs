@@ -88,8 +88,6 @@ loop w state = do
                     }
                else (resetTimer now) {snake = init $ newHead : snake state}
     hitsItself = any (samePosition newHead) (tail (snake state))
-    -- TODO: rename
-    theSamePositionAsNewHead = samePosition newHead
     eatsMeal = samePosition (head (snake state)) (meal state)
     samePosition (Vector ax ay) (Vector bx by) = ax == bx && ay == by
     nextGenerator = (snd . next) $ generator state
