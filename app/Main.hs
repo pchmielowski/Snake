@@ -79,13 +79,18 @@ loop w state = do
             else loop w $ updateTime now
   where
     nextFrame now =
-      if (eatsMeal)
-        then (resetTimer now)
-             { snake = newHead : snake state
-             , meal = randomMealPosition nextGenerator
-             , generator = nextGenerator
-             }
-        else (resetTimer now) {snake = init $ newHead : snake state}
+      if (hitsItself)
+        then error "Loser"
+        else if (eatsMeal)
+               then (resetTimer now)
+                    { snake = newHead : snake state
+                    , meal = randomMealPosition nextGenerator
+                    , generator = nextGenerator
+                    }
+               else (resetTimer now) {snake = init $ newHead : snake state}
+    hitsItself = any theSamePositionAsNewHead (tail (snake state))
+    -- TODO: rename
+    theSamePositionAsNewHead pos = x newHead == x pos && y newHead == y pos
     eatsMeal =
       x (head (snake state)) == x (meal state) &&
       y (head (snake state)) == y (meal state)
