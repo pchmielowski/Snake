@@ -57,7 +57,6 @@ y (Vector _ y) = y
 
 -- TODO: State = InGame | Lost
 --        gdzie InGame to rekord, który teraz się nazywa State
-
 data State = State
   { delta :: Integer
   , before :: Integer
@@ -96,18 +95,21 @@ loop w state = do
           if (ev' == EventCharacter 'q')
             then return ()
             else loop w $ updateTime now
-    -- TODO: check colision with walls
   where
     nextFrame now =
-      if (hitsItself)
+      if (hitsWall) -- TODO: refactor these ifs
         then error "Loser" -- TODO: handle
-        else if (eatsMeal)
-               then (resetTimer now)
-                    { snake = newHead : snake state
-                    , meal = randomMealPosition nextGenerator
-                    , generator = nextGenerator
-                    }
-               else (resetTimer now) {snake = init $ newHead : snake state}
+        else if (hitsItself)
+               then error "Loser" -- TODO: handle
+               else if (eatsMeal)
+                      then (resetTimer now)
+                           { snake = newHead : snake state
+                           , meal = randomMealPosition nextGenerator
+                           , generator = nextGenerator
+                           }
+                      else (resetTimer now)
+                           {snake = init $ newHead : snake state}
+    hitsWall = (x newHead) > (x end) -- TODO: more conditions
     hitsItself = any (samePosition newHead) $ tail $ snake state
     eatsMeal = samePosition (head (snake state)) $ meal state
     samePosition (Vector ax ay) (Vector bx by) = ax == bx && ay == by
