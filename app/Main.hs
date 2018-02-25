@@ -25,7 +25,8 @@ main =
       State
       { delta = 0
       , before = t
-      , snake = [Vector {x = 0, y = 0}]
+      , snake =
+          [Vector {x = 2, y = 0}, Vector {x = 1, y = 0}, Vector {x = 0, y = 0}]
       , velocity = Vector {x = 0, y = 0}
       , generator = g
       , meal = randomMealPosition g
@@ -87,11 +88,7 @@ loop w state = do
         else nexPosition now
     nextGenerator = (snd . next) (generator state)
     nexPosition now =
-      state
-      { delta = 0
-      , before = now
-      , snake = init $ newHead : snake state
-      }
+      state {delta = 0, before = now, snake = init $ newHead : snake state}
     newHead =
       Vector
       { x = x (head (snake state)) + x (velocity state)
@@ -111,8 +108,10 @@ loop w state = do
     updateScreen = do
       updateWindow w $ do
         clear
-        moveCursor (y (head (snake state))) (x (head (snake state)))
-        drawGlyph glyphStipple
+        mapM draw $ snake state
         moveCursor (y (meal state)) (x (meal state))
         drawGlyph glyphPlus
       render
+    draw pos = do
+      moveCursor (y pos) (x pos)
+      drawGlyph glyphStipple
