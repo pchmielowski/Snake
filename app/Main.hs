@@ -13,8 +13,10 @@ frameDelay = 123
 currentTime :: IO Integer
 currentTime = fmap round $ fmap (* 1000) getPOSIXTime
 
+width :: Integer
 width = 64
 
+height :: Integer
 height = 32
 
 start = Vector 4 4
@@ -39,9 +41,11 @@ main =
       , meal = randomMealPosition g
       }
 
-randomMealPosition g = Vector rand rand
+-- TODO: generates meal outside frame
+randomMealPosition g = Vector (position x) (position y)
   where
-    rand = toInteger $ (mod . fst . next) g 40
+    position f = rand (f start) (f end)
+    rand from to = (mod . toInteger . fst . next) g (from + to) - from
 
 data Vector =
   Vector Integer
