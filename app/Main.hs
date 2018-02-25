@@ -26,7 +26,7 @@ main =
       { delta = 0
       , before = t
       , snake = [Vector 2 0, Vector 1 0, Vector 0 0]
-      , velocity = Vector 0 0
+      , velocity = Vector 0 1
       , generator = g
       , meal = randomMealPosition g
       }
@@ -107,6 +107,7 @@ loop w state = do
     updateScreen = do
       updateWindow w $ do
         clear
+        drawFrame start end
         mapM drawSnakePart $ snake state
         draw glyphPlus $ meal state
       render
@@ -116,3 +117,14 @@ loop w state = do
       drawGlyph glyph
       moveCursor y $ 2 * x + 1
       drawGlyph glyph
+
+start = Vector 0 0
+
+end = Vector 10 10
+
+drawFrame (Vector sx sy) (Vector ex ey) = do
+  mapM_ drawBlock [sx .. ex]
+  where
+    drawBlock y = do
+      moveCursor y 0
+      drawGlyph glyphStipple
