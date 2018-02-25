@@ -79,14 +79,16 @@ loop w state = do
             else loop w $ updateTime now
   where
     nextFrame now =
-      if (x (head (snake state)) == x (meal state) &&
-          y (head (snake state)) == y (meal state))
+      if (eatsMeal)
         then (resetTimer now)
              { snake = newHead : snake state
              , meal = randomMealPosition nextGenerator
              , generator = nextGenerator
              }
         else (resetTimer now) {snake = init $ newHead : snake state}
+    eatsMeal =
+      x (head (snake state)) == x (meal state) &&
+      y (head (snake state)) == y (meal state)
     nextGenerator = (snd . next) (generator state)
     resetTimer now = state {delta = 0, before = now}
     newHead =
