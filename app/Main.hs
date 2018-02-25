@@ -90,12 +90,12 @@ loop w state = do
       state
       { delta = 0
       , before = now
-      , snake =
-          [ Vector
-            { x = x (head (snake state)) + x (velocity state)
-            , y = y (head (snake state)) + y (velocity state)
-            }
-          ]
+      , snake = init $ newHead : snake state
+      }
+    newHead =
+      Vector
+      { x = x (head (snake state)) + x (velocity state)
+      , y = y (head (snake state)) + y (velocity state)
       }
     changeDirection now ToLeft =
       (updateTime now) {velocity = Vector {x = (-1), y = 0}}
