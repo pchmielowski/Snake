@@ -109,9 +109,12 @@ loop w state = do
       updateWindow w $ do
         clear
         mapM draw $ snake state
-        moveCursor (y (meal state)) (x (meal state))
-        drawGlyph glyphPlus
+        foo (y (meal state)) (x (meal state)) glyphPlus
       render
     draw pos = do
-      moveCursor (y pos) (x pos)
-      drawGlyph glyphStipple
+      foo (y pos) (x pos) glyphStipple
+    foo y x glyph = do
+      moveCursor y $ 2 * x
+      drawGlyph glyph
+      moveCursor y $ 2 * x + 1
+      drawGlyph glyph
