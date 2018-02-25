@@ -29,7 +29,6 @@ main =
     setEcho False
     w <- defaultWindow
     t <- liftIO $ currentTime
-    -- loop w 0 t 0 0
     loop w State {delta = 0, before = t, x = 0, dx = 0}
 
 data State = State
@@ -44,15 +43,12 @@ loop w state = do
   now <- liftIO $ currentTime
   updateScreen
   if (delta state > frameDelay)
-    -- then loop w 0 now (x + dx) dx
     then loop w state {delta = 0, before = now, x = x state  + dx state}
     else do
       ev <- getEvent w $ Just 0
       case ev of
-        -- Nothing -> loop w (delta + (now - before)) now x dx
-        Nothing -> loop w state {delta = delta state + (now - before state), before = now}
+        Nothing -> nextFrame now 
         Just (EventSpecialKey KeyLeftArrow) ->
-          -- loop w (delta + (now - before)) now x (-1)
           loop w state {delta = delta state + (now - before state), before = now, dx=(-1)}
         -- Just (EventSpecialKey KeyRightArrow) ->
           -- loop w (delta + (now - before)) now x 1
@@ -63,8 +59,10 @@ loop w state = do
         Just ev' ->
           if (ev' == EventCharacter 'q')
             then return ()
-            else loop w state {delta = delta state + (now - before state), before = now}
+            else nextFrame now
   where
+    nextFrame now = loop w state {delta = delta state + (now - before state), before = now}
+
     updateScreen :: Curses ()
     updateScreen = do
       updateWindow w $ do
