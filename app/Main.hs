@@ -2,6 +2,7 @@ module Main where
 
 import Control.Monad.IO.Class
 import Data.Time.Clock.POSIX
+import System.Random
 import UI.NCurses
 
 import Lib
@@ -29,7 +30,10 @@ main =
     setEcho False
     w <- defaultWindow
     t <- liftIO $ currentTime
-    loop w State {delta = 0, before = t, x = 0, y = 0, dx = 0, dy = 0}
+    g <- liftIO $ getStdGen
+    loop
+      w
+      State {delta = 0, before = t, x = 0, y = 0, dx = 0, dy = 0, generator = g}
 
 data State = State
   { delta :: Integer
@@ -38,6 +42,7 @@ data State = State
   , dx :: Integer
   , y :: Integer
   , dy :: Integer
+  , generator :: StdGen
   }
 
 data Direction
@@ -83,4 +88,8 @@ loop w state = do
         clear
         moveCursor (y state) (x state)
         drawGlyph glyphStipple
+        moveCursor
+          (toInteger ((mod . fst . next) (generator state) 40))
+          (toInteger ((mod . fst . next) (generator state) 40))
+        drawGlyph glyphPlus
       render
