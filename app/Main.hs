@@ -28,7 +28,10 @@ main =
       , pos = Vector {x = 0, y = 0}
       , velocity = Vector {x = 0, y = 0}
       , generator = g
+      , meal = Vector {x = rand g, y = rand g}
       }
+  where
+    rand g = toInteger $ (mod . fst . next) g 40
 
 data Vector = Vector
   { x :: Integer
@@ -41,6 +44,7 @@ data State = State
   , pos :: Vector
   , velocity :: Vector
   , generator :: StdGen
+  , meal :: Vector
   }
 
 data Direction
@@ -97,8 +101,6 @@ loop w state = do
         clear
         moveCursor (y (pos state)) (x (pos state))
         drawGlyph glyphStipple
-        moveCursor
-          (toInteger ((mod . fst . next) (generator state) 40))
-          (toInteger ((mod . fst . next) (generator state) 40))
+        moveCursor (y (meal state)) (x (meal state))
         drawGlyph glyphPlus
       render
