@@ -1,6 +1,7 @@
 # A classic snake game in the pure functional style
 [![CircleCI](https://circleci.com/gh/pchmielowski/Snake.svg?style=svg)](https://circleci.com/gh/pchmielowski/Snake)
 
+![Screencast](snake.gif)
 
 Build with:
 * Haskell

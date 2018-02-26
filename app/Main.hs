@@ -11,10 +11,10 @@ currentTime :: IO Integer
 currentTime = fmap round $ fmap (* 1000) getPOSIXTime
 
 width :: Integer
-width = 64
+width = 40
 
 height :: Integer
-height = 32
+height = 20
 
 start = Vector 4 4
 
