@@ -4,3 +4,9 @@ Build with:
 * Haskell
 * Stack
 * Ncurses
+
+### How to use?
+```
+stack build
+stack exec snake-exe
+```
