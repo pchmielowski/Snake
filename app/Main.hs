@@ -166,8 +166,8 @@ loop w state = do
         drawString $ "Score: " ++ (show $ points state)
         drawFrame start end
         setColor snakeColor
-        mapM drawSnakePart $ snake state
         draw glyphPlus $ meal state
+        mapM drawSnakePart $ snake state
       render
     drawSnakePart = draw glyphStipple
     draw glyph (Vector x y) = do
