@@ -181,7 +181,7 @@ loop w state = do
       mapM_ drawBlock $ zip (repeat (sx - 1)) [sy - 1 .. ey + 1]
       mapM_ drawBlock $ zip (repeat (ex + 1)) [sy - 1 .. ey + 1]
       where
-        drawBlock :: (Integer, Integer) -> Update ()
+        drawBlock :: (Position, Position) -> Update ()
         drawBlock (x, y) = do
           moveCursor y $ scale x
           drawGlyph glyphStipple
