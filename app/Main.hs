@@ -47,9 +47,13 @@ randomMealPosition g = Vector (position x) (position y)
     position f = rand (f start) (f end)
     rand from to = (mod . toInteger . fst . next) g (from + to) - from
 
+type Time = Integer
+
+type Position = Integer
+
 data Vector =
-  Vector Integer
-         Integer
+  Vector Position
+         Position
 
 x (Vector x _) = x
 
@@ -58,8 +62,8 @@ y (Vector _ y) = y
 -- TODO: State = InGame | Lost
 --        gdzie InGame to rekord, który teraz się nazywa State
 data State = State
-  { delta :: Integer
-  , before :: Integer
+  { delta :: Time
+  , before :: Time
   , snake :: [Vector]
   , velocity :: Vector
   , generator :: StdGen
