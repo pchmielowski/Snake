@@ -24,6 +24,7 @@ main :: IO ()
 main =
   runCurses $ do
     setEcho False
+    setCursorMode CursorInvisible
     w <- defaultWindow
     t <- liftIO $ currentTime
     g <- liftIO $ getStdGen
