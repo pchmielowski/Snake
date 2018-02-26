@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: wget https://github.com/commercialhaskell/stack/releases/download/v1.2.0/stack-1.2.0-linux-x86_64.tar.gz -O /tmp/stack.tar.gz && mkdir /tmp/stack/ && tar -xvzf /tmp/stack.tar.gz -C /tmp/stack/ && sudo mv /tmp/stack/stack-1.2.0-linux-x86_64/stack /usr/bin/stack
+      - run:
+          name: Build
+          command: stack setup && stack build
