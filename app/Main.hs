@@ -32,7 +32,7 @@ main =
     g <- liftIO $ getStdGen
     loop
       w
-      State
+      InGame
       { delta = 0
       , before = t
       , snake = [start]
@@ -61,14 +61,14 @@ y (Vector _ y) = y
 
 -- TODO: State = InGame | Lost
 --        gdzie InGame to rekord, który teraz się nazywa State
-data State = State
-  { delta :: Time
-  , before :: Time
-  , snake :: [Vector]
-  , velocity :: Vector
-  , generator :: StdGen
-  , meal :: Vector
-  }
+data State
+  = InGame { delta :: Time
+           , before :: Time
+           , snake :: [Vector]
+           , velocity :: Vector
+           , generator :: StdGen
+           , meal :: Vector }
+  | Lost
 
 data Direction
   = ToLeft
@@ -77,6 +77,21 @@ data Direction
   | ToDown
 
 loop :: Window -> State -> Curses ()
+loop w Lost = do
+  first <- newColorID ColorRed ColorBlack 5
+  second <- newColorID ColorGreen ColorBlack 6
+  updateWindow w $ do 
+    clear
+    setColor first
+    moveCursor 16 16
+    drawString "you lost xD"
+    setColor second
+    moveCursor 24 24
+    drawString "Press any key.."
+  render
+  ev <- getEvent w Nothing
+  case ev of
+    Just ev' -> return ()
 loop w state = do
   now <- liftIO $ currentTime
   frameColor <- newColorID ColorRed ColorBlack 1
@@ -100,9 +115,10 @@ loop w state = do
             then return ()
             else loop w $ updateTime now
   where
+    nextFrame :: Time -> State
     nextFrame now =
       if (hitsWall) -- TODO: refactor these ifs
-        then error "Loser" -- TODO: handle
+        then Lost
         else if (hitsItself)
                then error "Loser" -- TODO: handle
                else if (eatsMeal)
