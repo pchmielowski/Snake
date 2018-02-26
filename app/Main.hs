@@ -38,12 +38,13 @@ initial t g =
   , generator = g
   , meal = randomMealPosition g
   , points = 0
+  , delay = 100
   }
 
 randomMealPosition g = Vector (position x) (position y)
   where
     position f = rand (f start) (f end)
-    rand from to = (mod . toInteger . fst . next) g (to - 1) + from
+    rand from to = (mod . toInteger . fst . next) g (to - from) + from
 
 type Time = Integer
 
