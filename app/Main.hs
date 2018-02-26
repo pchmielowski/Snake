@@ -42,11 +42,10 @@ initial t g =
   , meal = randomMealPosition g
   }
 
--- TODO: generates meal outside frame
 randomMealPosition g = Vector (position x) (position y)
   where
     position f = rand (f start) (f end)
-    rand from to = (mod . toInteger . fst . next) g (from + to) - from
+    rand from to = (mod . toInteger . fst . next) g (to - 1) + from
 
 type Time = Integer
 
