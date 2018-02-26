@@ -55,6 +55,7 @@ type Position = Integer
 data Vector =
   Vector Position
          Position
+  deriving (Eq)
 
 x (Vector x _) = x
 
@@ -131,9 +132,8 @@ loop w state = do
       let x' = x newHead
           y' = y newHead
       in x' > x end || x' < x start || y' > y end || y' < y start
-    hitsItself = any (samePosition newHead) $ tail $ snake state
-    eatsMeal = samePosition (head (snake state)) $ meal state
-    samePosition (Vector ax ay) (Vector bx by) = ax == bx && ay == by
+    hitsItself = any (newHead ==) $ tail $ snake state
+    eatsMeal = head (snake state) == (meal state)
     nextGenerator = (snd . next) $ generator state
     resetTimer now = state {delta = 0, before = now}
     newHead = updatePosition (head (snake state)) (velocity state)
