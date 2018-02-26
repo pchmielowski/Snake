@@ -60,8 +60,6 @@ x (Vector x _) = x
 
 y (Vector _ y) = y
 
--- TODO: State = InGame | Lost
---        gdzie InGame to rekord, który teraz się nazywa State
 data State
   = InGame { delta :: Time
            , before :: Time
