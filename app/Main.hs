@@ -30,16 +30,17 @@ main =
     w <- defaultWindow
     t <- liftIO $ currentTime
     g <- liftIO $ getStdGen
-    loop
-      w
-      InGame
-      { delta = 0
-      , before = t
-      , snake = [start]
-      , velocity = Vector 0 1
-      , generator = g
-      , meal = randomMealPosition g
-      }
+    loop w $ initial t g
+
+initial t g =
+  InGame
+  { delta = 0
+  , before = t
+  , snake = [start]
+  , velocity = Vector 0 1
+  , generator = g
+  , meal = randomMealPosition g
+  }
 
 -- TODO: generates meal outside frame
 randomMealPosition g = Vector (position x) (position y)
@@ -80,7 +81,7 @@ loop :: Window -> State -> Curses ()
 loop w Lost = do
   first <- newColorID ColorRed ColorBlack 5
   second <- newColorID ColorGreen ColorBlack 6
-  updateWindow w $ do 
+  updateWindow w $ do
     clear
     setColor first
     moveCursor 16 16
