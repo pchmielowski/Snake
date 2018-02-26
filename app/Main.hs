@@ -85,7 +85,7 @@ loop w Lost = do
     clear
     setColor first
     moveCursor 16 16
-    drawString "you lost xD"
+    drawString "you've lost xD"
     setColor second
     moveCursor 24 24
     drawString "Press any key.."
