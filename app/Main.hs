@@ -40,6 +40,7 @@ initial t g =
   , velocity = Vector 0 1
   , generator = g
   , meal = randomMealPosition g
+  , points = 0
   }
 
 randomMealPosition g = Vector (position x) (position y)
@@ -65,7 +66,8 @@ data State
            , snake :: [Vector]
            , velocity :: Vector
            , generator :: StdGen
-           , meal :: Vector }
+           , meal :: Vector
+           , points :: Int }
   | Lost
 
 data Direction
@@ -122,6 +124,7 @@ loop w state = do
                     { snake = newHead : snake state
                     , meal = randomMealPosition nextGenerator
                     , generator = nextGenerator
+                    , points = points state + 1
                     }
                else (resetTimer now) {snake = init $ newHead : snake state}
     hitsWall =
@@ -159,6 +162,8 @@ loop w state = do
       updateWindow w $ do
         clear
         setColor frameColor
+        moveCursor (y start - 2) (scale (x start))
+        drawString $ "Score: " ++ (show $ points state)
         drawFrame start end
         setColor snakeColor
         mapM drawSnakePart $ snake state
