@@ -128,8 +128,7 @@ loop w state = do
                            }
                       else (resetTimer now)
                            {snake = init $ newHead : snake state}
-    hitsWall -- TODO: does not work correctly
-     =
+    hitsWall =
       let x' = x newHead
           y' = y newHead
       in x' > x end || x' < x start || y' > y end || y' < y start
@@ -140,7 +139,6 @@ loop w state = do
     resetTimer now = state {delta = 0, before = now}
     newHead = updatePosition (head (snake state)) (velocity state)
     updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
-    -- TODO: do not allow to reverse direction
     changeDirection now ToLeft = turnX (-1) now
     changeDirection now ToRight = turnX 1 now
     changeDirection now ToDown = turnY 1 now
