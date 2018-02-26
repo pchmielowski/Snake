@@ -82,7 +82,6 @@ loop w Lost = do
   first <- newColorID ColorRed ColorBlack 5
   second <- newColorID ColorGreen ColorBlack 6
   updateWindow w $ do
-    clear
     setColor first
     moveCursor 16 16
     drawString "you've lost xD"
