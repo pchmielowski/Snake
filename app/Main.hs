@@ -126,10 +126,23 @@ loop w state = do
     newHead = updatePosition (head (snake state)) (velocity state)
     updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
     -- TODO: do not allow to reverse direction
-    changeDirection now ToLeft = (updateTime now) {velocity = Vector (-1) 0}
-    changeDirection now ToRight = (updateTime now) {velocity = Vector 1 0}
-    changeDirection now ToDown = (updateTime now) {velocity = Vector 0 1}
-    changeDirection now ToUp = (updateTime now) {velocity = Vector 0 (-1)}
+    changeDirection now ToLeft = turnX (-1) now
+    changeDirection now ToRight = turnX 1 now
+    changeDirection now ToDown = turnY 1 now
+    changeDirection now ToUp = turnY (-1) now
+    turnX = turn x (\dir -> Vector dir 0)
+    turnY = turn y (\dir -> Vector 0 dir)
+    turn ::
+         (Vector -> Position)
+      -> (Position -> Vector)
+      -> Position
+      -> Time
+      -> State
+    turn get toVector direction now =
+      let updated = updateTime now
+      in if (get (velocity state) /= 0)
+           then updated
+           else updated {velocity = (toVector direction)}
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
     -- updateScreen :: Curses ()
