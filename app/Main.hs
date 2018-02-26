@@ -116,18 +116,15 @@ loop w state = do
   where
     nextFrame :: Time -> State
     nextFrame now =
-      if (hitsWall) -- TODO: refactor these ifs
+      if (hitsWall || hitsItself)
         then Lost
-        else if (hitsItself)
-               then error "Loser" -- TODO: handle
-               else if (eatsMeal)
-                      then (resetTimer now)
-                           { snake = newHead : snake state
-                           , meal = randomMealPosition nextGenerator
-                           , generator = nextGenerator
-                           }
-                      else (resetTimer now)
-                           {snake = init $ newHead : snake state}
+        else if (eatsMeal)
+               then (resetTimer now)
+                    { snake = newHead : snake state
+                    , meal = randomMealPosition nextGenerator
+                    , generator = nextGenerator
+                    }
+               else (resetTimer now) {snake = init $ newHead : snake state}
     hitsWall =
       let x' = x newHead
           y' = y newHead
