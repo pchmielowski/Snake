@@ -7,9 +7,6 @@ import UI.NCurses
 
 import Lib
 
--- milliseconds
-frameDelay = 123
-
 currentTime :: IO Integer
 currentTime = fmap round $ fmap (* 1000) getPOSIXTime
 
@@ -68,7 +65,8 @@ data State
            , velocity :: Vector
            , generator :: StdGen
            , meal :: Vector
-           , points :: Int }
+           , points :: Int
+           , delay :: Time }
   | Lost
 
 data Direction
@@ -98,7 +96,7 @@ loop w state = do
   frameColor <- newColorID ColorRed ColorBlack 1
   snakeColor <- newColorID ColorBlue ColorBlack 2
   updateScreen frameColor snakeColor
-  if (delta state > frameDelay)
+  if (delta state > delay state)
     then loop w $ nextFrame now
     else do
       ev <- getEvent w $ Just 0
@@ -126,6 +124,7 @@ loop w state = do
                     , meal = randomMealPosition nextGenerator
                     , generator = nextGenerator
                     , points = points state + 1
+                    , delay = delay state - 3
                     }
                else (resetTimer now) {snake = init $ newHead : snake state}
     hitsWall =
