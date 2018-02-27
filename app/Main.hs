@@ -131,10 +131,7 @@ loop w state = do
                        , points = points state + 1
                        , delay = delay state - 3
                        }
-                  else updated
-                       { snake = move $ snake state
-                       , velocity = updateVelocity $ direction state
-                       }
+                  else updated {snake = move $ snake state}
     updateVelocity :: Direction -> Vector
     updateVelocity ToLeft = turn (Vector (-1) 0) $ velocity state
     updateVelocity ToRight = turn (Vector (1) 0) $ velocity state
@@ -158,7 +155,8 @@ loop w state = do
     eatsMeal = head (snake state) == (meal state)
     nextGenerator = (snd . next) $ generator state
     resetTimer now = state {delta = 0, before = now}
-    newHead = updatePosition (head (snake state)) (velocity state) -- TODO: include velocity change
+    newHead =
+      updatePosition (head (snake state)) $ updateVelocity $ direction state
     updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
