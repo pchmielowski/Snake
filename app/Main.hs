@@ -35,7 +35,8 @@ initial t g =
   { delta = 0
   , before = t
   , snake = [start]
-  , velocity = Vector 0 1
+  , velocity = Vector 0 0
+  , direction = ToRight
   , generator = g
   , meal = randomMealPosition g
   , points = 0
@@ -65,6 +66,7 @@ data State
            , before :: Time
            , snake :: [Vector]
            , velocity :: Vector
+           , direction :: Direction
            , generator :: StdGen
            , meal :: Vector
            , points :: Int
@@ -104,12 +106,13 @@ loop w state = do
       case ev of
         Nothing -> loop w $ updateTime now
         Just (EventSpecialKey KeyLeftArrow) ->
-          loop w $ changeDirection now ToLeft
+          loop w $ (updateTime now) {direction = ToLeft}
         Just (EventSpecialKey KeyRightArrow) ->
-          loop w $ changeDirection now ToRight
+          loop w $ (updateTime now) {direction = ToRight}
         Just (EventSpecialKey KeyDownArrow) ->
-          loop w $ changeDirection now ToDown
-        Just (EventSpecialKey KeyUpArrow) -> loop w $ changeDirection now ToUp
+          loop w $ (updateTime now) {direction = ToDown}
+        Just (EventSpecialKey KeyUpArrow) ->
+          loop w $ (updateTime now) {direction = ToUp}
         Just ev' ->
           if (ev' == EventCharacter 'q')
             then return ()
@@ -119,15 +122,34 @@ loop w state = do
     nextFrame now =
       if (hitsWall || hitsItself)
         then Lost
-        else if (eatsMeal)
-               then (resetTimer now)
-                    { snake = newHead : snake state
-                    , meal = randomMealPosition nextGenerator
-                    , generator = nextGenerator
-                    , points = points state + 1
-                    , delay = delay state - 3
-                    }
-               else (resetTimer now) {snake = init $ newHead : snake state}
+        else let updated = resetTimer now
+             in if (eatsMeal)
+                  then updated
+                       { snake = newHead : snake state
+                       , meal = randomMealPosition nextGenerator
+                       , generator = nextGenerator
+                       , points = points state + 1
+                       , delay = delay state - 3
+                       }
+                  else updated
+                       { snake = move $ snake state
+                       , velocity = updateVelocity $ direction state
+                       }
+    updateVelocity :: Direction -> Vector
+    updateVelocity ToLeft = turn (Vector (-1) 0) $ velocity state
+    updateVelocity ToRight = turn (Vector (1) 0) $ velocity state
+    updateVelocity ToUp = turn (Vector 0 (-1)) $ velocity state
+    updateVelocity ToDown = turn (Vector 0 (1)) $ velocity state
+    turn :: Vector -> Vector -> Vector
+    turn (Vector 0 dy) (Vector x y) =
+      if (y /= 0)
+        then Vector x y
+        else Vector 0 dy
+    turn (Vector dx 0) (Vector x y) =
+      if (x /= 0)
+        then Vector x y
+        else Vector dx 0
+    move snake = init $ newHead : snake
     hitsWall =
       let x' = x newHead
           y' = y newHead
@@ -136,28 +158,10 @@ loop w state = do
     eatsMeal = head (snake state) == (meal state)
     nextGenerator = (snd . next) $ generator state
     resetTimer now = state {delta = 0, before = now}
-    newHead = updatePosition (head (snake state)) (velocity state)
+    newHead = updatePosition (head (snake state)) (velocity state) -- TODO: include velocity change
     updatePosition (Vector x y) (Vector dx dy) = Vector (x + dx) (y + dy)
-    changeDirection now ToLeft = turnX (-1) now
-    changeDirection now ToRight = turnX 1 now
-    changeDirection now ToDown = turnY 1 now
-    changeDirection now ToUp = turnY (-1) now
-    turnX = turn x (\dir -> Vector dir 0)
-    turnY = turn y (\dir -> Vector 0 dir)
-    turn ::
-         (Vector -> Position)
-      -> (Position -> Vector)
-      -> Position
-      -> Time
-      -> State
-    turn get toVector direction now =
-      let updated = updateTime now
-      in if (get (velocity state) /= 0)
-           then updated
-           else updated {velocity = (toVector direction)}
     updateTime now =
       state {delta = delta state + (now - before state), before = now}
-    -- updateScreen :: Curses ()
     updateScreen frameColor snakeColor = do
       updateWindow w $ do
         clear
