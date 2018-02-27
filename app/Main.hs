@@ -89,11 +89,14 @@ loop w Lost = do
     drawString "you've lost xD"
     setColor second
     moveCursor 24 24
-    drawString "Press any key.."
+    drawString "Press q to quit.."
   render
   ev <- getEvent w Nothing
   case ev of
-    Just ev' -> return ()
+    Just ev' ->
+      if (ev' == EventCharacter 'q')
+        then return ()
+        else loop w Lost
 loop w state = do
   now <- liftIO $ currentTime
   frameColor <- newColorID ColorRed ColorBlack 1
